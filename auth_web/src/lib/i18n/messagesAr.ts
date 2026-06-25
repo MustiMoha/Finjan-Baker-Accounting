@@ -2,7 +2,7 @@ import type { MessageKey } from "./messages";
 
 /** Built-in Arabic UI strings (instant; no API wait for catalog keys). */
 export const messagesAr: Record<MessageKey, string> = {
-  "app.name": "بيكر",
+  "app.name": "علي آل بكر",
   "app.tagline": "لوحة المحاسبة",
   "lang.english": "الإنجليزية",
   "lang.arabic": "العربية",
@@ -42,14 +42,14 @@ export const messagesAr: Record<MessageKey, string> = {
   "common.submit": "إرسال",
 
   "auth.welcomeBack": "مرحباً بعودتك",
-  "auth.signInSubtitle": "سجّل الدخول إلى حساب بيكر",
+  "auth.signInSubtitle": "سجّل الدخول إلى لوحة علي آل بكر للمحاسبة",
   "auth.email": "البريد الإلكتروني",
   "auth.password": "كلمة المرور",
   "auth.signIn": "تسجيل الدخول",
-  "auth.newToBaker": "جديد على بيكر؟",
+  "auth.newToBaker": "جديد على علي آل بكر؟",
   "auth.createAccount": "إنشاء حساب",
   "auth.registerTitle": "إنشاء حسابك",
-  "auth.registerSubtitle": "ابدأ مع بيكر",
+  "auth.registerSubtitle": "ابدأ مع لوحة علي آل بكر للمحاسبة",
   "auth.yourName": "اسمك",
   "auth.confirmPassword": "تأكيد كلمة المرور",
   "auth.register": "تسجيل",

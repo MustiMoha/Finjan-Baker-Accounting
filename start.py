@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Start Baker: auth UI + API + Streamlit dashboard with one command."""
+"""Start Ali Al Baker Accounting Dashboard: auth UI + API + Streamlit with one command."""
 
 from __future__ import annotations
 
@@ -100,7 +100,7 @@ def free_port(port: int, *, label: str) -> None:
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Start the Baker accounting app")
+    parser = argparse.ArgumentParser(description="Start Ali Al Baker Accounting Dashboard")
     parser.add_argument("--build", action="store_true", help="Force rebuild of the auth UI")
     parser.add_argument("--no-build", action="store_true", help="Skip auth UI build (use existing dist/)")
     args = parser.parse_args()
@@ -120,7 +120,7 @@ def main() -> None:
     if hasattr(signal, "SIGTERM"):
         signal.signal(signal.SIGTERM, shutdown)
 
-    print("Starting Baker…")
+    print("Starting Ali Al Baker Accounting Dashboard…")
     free_port(API_PORT, label="API")
     free_port(STREAMLIT_PORT, label="Financials")
 

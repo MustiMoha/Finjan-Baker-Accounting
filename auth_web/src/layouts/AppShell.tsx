@@ -126,6 +126,7 @@ export function AppShell() {
         <div className="mb-4 flex items-start justify-between gap-2 px-2">
           <div className="min-w-0 flex-1">
           <p className="text-lg font-bold text-slate-900">{t("app.name")}</p>
+          <p className="text-xs font-medium text-slate-500">{t("app.tagline")}</p>
           <p className="mt-1 truncate text-xs text-slate-500">{user?.email}</p>
           {ctx?.org.name ? (
             <p className="mt-1 truncate text-xs font-medium text-slate-600">{ctx.org.name}</p>

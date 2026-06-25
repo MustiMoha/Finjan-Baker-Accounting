@@ -119,7 +119,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           msg = err.message;
         } else if (err instanceof TypeError) {
           msg =
-            "Cannot reach the Baker API. Start the API (port 8000) or run the app via start.py, then retry.";
+            "Cannot reach the Ali Al Baker API. Start the API (port 8000) or run the app via start.py, then retry.";
         } else if (err instanceof Error && err.message) {
           msg = err.message;
         }
