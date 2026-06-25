@@ -1,0 +1,9 @@
+# Copy to railway.toml at repo root for the Streamlit service (second Railway service).
+
+[build]
+builder = "nixpacks"
+buildCommand = "pip install -r requirements.txt"
+
+[deploy]
+startCommand = "bash deploy/start-streamlit.sh"
+restartPolicyType = "on_failure"

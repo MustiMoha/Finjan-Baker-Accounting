@@ -1,0 +1,14 @@
+# Copy to railway.toml at repo root for the API service, or set equivalent in Railway UI.
+
+[build]
+builder = "nixpacks"
+buildCommand = "pip install -r requirements.txt"
+
+[deploy]
+startCommand = "bash deploy/start-api.sh"
+healthcheckPath = "/api/health"
+healthcheckTimeout = 120
+restartPolicyType = "on_failure"
+
+[deploy.env]
+SERVE_AUTH_UI = "false"

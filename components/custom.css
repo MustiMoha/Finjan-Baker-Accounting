@@ -1,0 +1,213 @@
+/* Fintech-style shell (dark sidebar / light canvas — typical Make “dashboard” layouts) */
+@import url("https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400..700;1,9..40,400..700&display=swap");
+
+:root {
+  --ft-accent: #14b8a6;
+  --ft-accent-strong: #0d9488;
+  --ft-bg-main: #f0f4f8;
+  --ft-bg-sidebar: #12151f;
+  --ft-bg-sidebar-end: #1a2234;
+  --ft-surface: #ffffff;
+  --ft-text: #0f172a;
+  --ft-muted: #64748b;
+  --ft-border: rgba(148, 163, 184, 0.35);
+  --ft-card-shadow: 0 4px 24px rgba(15, 23, 42, 0.07);
+  --ft-radius: 14px;
+  --ft-radius-sm: 10px;
+}
+
+html,
+body,
+.stApp {
+  font-family: "DM Sans", "Segoe UI", system-ui, sans-serif !important;
+}
+
+.stApp {
+  background: var(--ft-bg-main);
+  color: var(--ft-text);
+}
+
+/* Top chrome */
+header[data-testid="stHeader"] {
+  background: var(--ft-surface);
+  border-bottom: 1px solid var(--ft-border);
+}
+
+.block-container {
+  padding-top: 1.5rem;
+  padding-bottom: 3rem;
+  max-width: 1280px;
+}
+
+/* Sidebar — dark fintech rail */
+[data-testid="stSidebar"] {
+  background: linear-gradient(165deg, var(--ft-bg-sidebar) 0%, var(--ft-bg-sidebar-end) 48%, #0f1419 100%);
+  border-right: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+[data-testid="stSidebar"] [data-testid="stMarkdown"] p,
+[data-testid="stSidebar"] .stMarkdown,
+[data-testid="stSidebar"] label,
+[data-testid="stSidebar"] span {
+  color: #e2e8f0 !important;
+}
+
+[data-testid="stSidebar"] hr {
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+[data-testid="stSidebar"] .stCaption,
+[data-testid="stSidebar"] [data-testid="stCaption"] {
+  color: #94a3b8 !important;
+}
+
+/* Hero / dashboard header injected from Python */
+.ft-hero {
+  background: var(--ft-surface);
+  border: 1px solid var(--ft-border);
+  border-radius: var(--ft-radius);
+  box-shadow: var(--ft-card-shadow);
+  padding: 1.35rem 1.5rem 1.45rem;
+  margin-bottom: 1.35rem;
+}
+.ft-hero-top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.85rem;
+}
+.ft-pill {
+  display: inline-block;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ft-accent-strong);
+  background: rgba(20, 184, 166, 0.12);
+  border: 1px solid rgba(20, 184, 166, 0.35);
+  border-radius: 999px;
+  padding: 0.26rem 0.75rem;
+}
+.ft-pill-muted {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--ft-muted);
+}
+.ft-hero h1.ft-hero-title {
+  font-size: clamp(1.55rem, 2.8vw, 1.95rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--ft-text);
+  margin: 0 0 0.45rem;
+  line-height: 1.15;
+}
+.ft-hero p.ft-hero-sub {
+  margin: 0;
+  font-size: 0.94rem;
+  color: var(--ft-muted);
+  line-height: 1.55;
+  max-width: 52rem;
+}
+
+/* Section headings in main column */
+.main h2,
+.main h3,
+section.main h2,
+section.main h3 {
+  font-weight: 600 !important;
+  letter-spacing: -0.015em;
+  color: var(--ft-text);
+}
+
+.main h2 {
+  font-size: 1.22rem !important;
+  padding-bottom: 0.35rem;
+  border-bottom: 2px solid rgba(20, 184, 166, 0.35);
+  display: inline-block;
+  margin-top: 0.35rem !important;
+}
+
+/* Bordered panels (Streamlit container border=True) */
+div[data-testid="stVerticalBlockBorderWrapper"] {
+  background: var(--ft-surface) !important;
+  border-radius: var(--ft-radius) !important;
+  border-color: var(--ft-border) !important;
+  box-shadow: var(--ft-card-shadow) !important;
+  padding: 0.85rem 1rem 1.1rem !important;
+  margin-bottom: 1.1rem !important;
+}
+
+/* KPI metrics — fintech tiles */
+div[data-testid="stMetric"] {
+  background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
+  border: 1px solid var(--ft-border);
+  border-radius: var(--ft-radius-sm);
+  padding: 0.72rem 0.92rem;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
+}
+
+div[data-testid="stMetric"] label[data-testid="stMetricLabel"] {
+  font-size: 0.78rem !important;
+  font-weight: 500 !important;
+  color: var(--ft-muted) !important;
+  text-transform: none;
+  white-space: normal !important;
+}
+
+div[data-testid="stMetric"] [data-testid="stMetricValue"] {
+  font-variant-numeric: tabular-nums;
+  overflow: visible !important;
+  text-overflow: clip !important;
+  white-space: normal !important;
+  word-break: break-word;
+  line-height: 1.25;
+  min-width: 0;
+}
+
+/* Charts */
+iframe[title="streamlit_plotly_chart"] {
+  border-radius: var(--ft-radius-sm);
+  border: 1px solid var(--ft-border);
+  box-shadow: 0 2px 12px rgba(15, 23, 42, 0.04);
+}
+
+/* File upload — prominent choose-file control */
+[data-testid="stFileUploader"] {
+  border: 2px solid rgba(20, 184, 166, 0.55) !important;
+  border-radius: var(--ft-radius) !important;
+  background: linear-gradient(180deg, rgba(20, 184, 166, 0.08) 0%, #ffffff 100%) !important;
+  padding: 1.25rem 1rem !important;
+  box-shadow: 0 2px 10px rgba(15, 23, 42, 0.06) !important;
+}
+
+[data-testid="stFileUploader"] section[data-testid="stFileUploaderDropzone"] {
+  border: 2px dashed rgba(13, 148, 136, 0.45) !important;
+  border-radius: var(--ft-radius-sm) !important;
+  background: rgba(20, 184, 166, 0.06) !important;
+  padding: 1.5rem 1rem !important;
+}
+
+[data-testid="stFileUploader"] section[data-testid="stFileUploaderDropzone"] button {
+  background: var(--ft-accent-strong) !important;
+  color: #ffffff !important;
+  border: none !important;
+  border-radius: 8px !important;
+  font-size: 0.9rem !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.02em !important;
+  padding: 0.6rem 1.5rem !important;
+  min-height: 2.5rem !important;
+  box-shadow: 0 3px 10px rgba(13, 148, 136, 0.4) !important;
+}
+
+[data-testid="stFileUploader"] section[data-testid="stFileUploaderDropzone"] button:hover {
+  background: #0f766e !important;
+}
+
+[data-testid="stFileUploader"] section[data-testid="stFileUploaderDropzone"] small {
+  color: var(--ft-muted) !important;
+  font-weight: 500 !important;
+}
+

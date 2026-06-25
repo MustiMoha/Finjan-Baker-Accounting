@@ -1,0 +1,15 @@
+# Fintech-style shell (Streamlit theme + custom.css)
+[theme]
+primaryColor = "#14b8a6"
+backgroundColor = "#f0f4f8"
+secondaryBackgroundColor = "#ffffff"
+textColor = "#0f172a"
+font = "sans serif"
+
+[client]
+toolbarMode = "minimal"
+
+[server]
+port = 8501
+address = "127.0.0.1"
+headless = true
