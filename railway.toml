@@ -1,0 +1,15 @@
+# Default Railway config for the API service (repo root).
+# Streamlit service: set Config Path to deploy/railway-streamlit.toml in Railway UI.
+
+[build]
+builder = "nixpacks"
+buildCommand = "pip install -r requirements.txt"
+
+[deploy]
+startCommand = "bash deploy/start-api.sh"
+healthcheckPath = "/api/health"
+healthcheckTimeout = 120
+restartPolicyType = "on_failure"
+
+[deploy.env]
+SERVE_AUTH_UI = "false"

@@ -24,8 +24,9 @@ After deploy you will have three URLs — fill them in everywhere marked `YOUR_V
 
 ## 1. Railway — API (first service)
 
-1. Deploy from GitHub → repo root.
-2. **Start command:** `bash deploy/start-api.sh`
+1. Deploy from GitHub → **root directory** = repo root (not `api/`).
+2. **Config path:** leave default (`railway.toml` at repo root) or set start command: `bash deploy/start-api.sh`
+   (Nixpacks defaults to `uvicorn main:app`; root `main.py` re-exports the FastAPI app.)
 3. **Networking** → public domain → `YOUR_API_URL`
 4. **Variables:**
 
@@ -49,7 +50,8 @@ After deploy you will have three URLs — fill them in everywhere marked `YOUR_V
 ## 2. Railway — Streamlit (second service)
 
 1. Same repo → add **second service**.
-2. **Start command:** `bash deploy/start-streamlit.sh`
+2. **Config path:** `deploy/railway-streamlit.toml` (do not use root `railway.toml` — that starts the API).
+3. **Start command:** `bash deploy/start-streamlit.sh` (if not using the streamlit config file).
 3. Public domain → `YOUR_STREAMLIT_URL`
 4. **Variables:**
 
