@@ -15,7 +15,7 @@ After deploy you will have three URLs — fill them in everywhere marked `YOUR_V
 | --------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `SUPABASE_URL`              | `https://cafomnrnrniqigzvbhho.supabase.co`                                                                                                                                                                                  |
 | `SUPABASE_ANON_KEY`         | `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNhZm9tbnJucm5pcWlnenZiaGhvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgwNjM1ODQsImV4cCI6MjA5MzYzOTU4NH0.-_3pOqVZzSqooes7870v3lZkvjmYDA_GZXdmu8ULJ8E`          |
-| `SUPABASE_SERVICE_ROLE_KEY` | eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNhZm9tbnJucm5pcWlnenZiaGhvIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3ODA2MzU4NCwiZXhwIjoyMDkzNjM5NTg0fQ.VNZrBn_bekY5D9JRlr_9tqiiKHyCHO5LoT50tbs686Q |
+| `SUPABASE_SERVICE_ROLE_KEY` | Ask repo owner (Supabase Dashboard → Settings → API). Never commit this key. |
 | `MASTER_WORKBOOK_BUCKET`    | `accounting-master`                                                                                                                                                                                                         |
 | `DOCUMENTS_BUCKET`          | `accounting-documents`                                                                                                                                                                                                      |
 
