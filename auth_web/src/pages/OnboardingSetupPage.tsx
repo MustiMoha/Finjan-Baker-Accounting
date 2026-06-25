@@ -70,7 +70,7 @@ export function OnboardingSetupPage() {
     return (
       <AuthLayout
         title="Choose your role"
-        subtitle="This controls what you see in Baker. You can preview other roles later from the sidebar."
+        subtitle="This controls what you see in Ali Al Baker Accounting Dashboard. You can preview other roles later from the sidebar."
       >
         <div className="space-y-3">
           {ROLES.map((role) => (

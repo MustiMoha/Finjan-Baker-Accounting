@@ -103,7 +103,7 @@ def _mymemory_translate(text: str, *, source: str, target: str) -> str:
     params = urllib.parse.urlencode({"q": q, "langpair": f"{src}|{tgt}"})
     req = urllib.request.Request(
         f"{_MYMEMORY_URL}?{params}",
-        headers={"User-Agent": "Baker/1.0"},
+        headers={"User-Agent": "AliAlBakerAccounting/1.0"},
     )
     with urllib.request.urlopen(req, timeout=12) as resp:
         payload: Any = json.loads(resp.read().decode("utf-8"))

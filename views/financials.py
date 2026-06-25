@@ -21,6 +21,7 @@ import gl_workbook_loader as gl_wb
 import org
 import statement_export as stm_exp
 import supabase_storage_workbook as sbw
+from branding import APP_SHORT
 from ui_locale import append_locale_to_url, tr
 from views import gl_sheet_editor
 
@@ -90,7 +91,7 @@ def _render_gl_row_count_caption(
     st.caption(
         "".join(parts)
         + layout_note
-        + tr(" Click **Refresh** to reload the workbook from storage (same as reopening from Baker).")
+        + tr(f" Click **Refresh** to reload the workbook from storage (same as reopening from {APP_SHORT}).")
     )
 
 
@@ -245,7 +246,7 @@ def _refresh_financials_page(client, secrets: Mapping[str, Any]) -> None:
         st.session_state["_app_page_marker"] = ""
         safe_url = html.escape(handoff_url, quote=True)
         st.markdown(f'<meta http-equiv="refresh" content="0;url={safe_url}">', unsafe_allow_html=True)
-        st.link_button(tr("Reload Financials from Baker"), handoff_url)
+        st.link_button(tr(f"Reload Financials from {APP_SHORT}"), handoff_url)
         st.stop()
 
     err = gl_wb.refresh_workbook_session_cache(client, dict(secrets))
@@ -271,7 +272,7 @@ def _render_financial_workbook_tabs(client, role: str) -> None:
         if st.button(
             tr("Refresh"),
             key="financials_refresh_workbook",
-            help=tr("Re-handoff from Baker (when online) and reload the master workbook from storage."),
+            help=tr(f"Re-handoff from {APP_SHORT} (when online) and reload the master workbook from storage."),
         ):
             _refresh_financials_page(client, dict(st.secrets))
     with refresh_c2:

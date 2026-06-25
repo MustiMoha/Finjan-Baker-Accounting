@@ -13,6 +13,7 @@ import streamlit as st
 import database as db
 import gl_workbook_loader as gl_wb
 import org
+from branding import APP_NAME, APP_SHORT
 from runtime_settings import get_setting
 from components import inject_custom_css
 from ui_locale import append_locale_to_url, init_locale_from_query, inject_rtl_styles, render_language_toggle, tr
@@ -44,7 +45,7 @@ def _auth_web_url(path: str = "") -> str:
 def _redirect_to_auth_web(path: str = "/sign-in") -> None:
     url = _auth_web_url(path)
     st.markdown(f'<meta http-equiv="refresh" content="0;url={url}">', unsafe_allow_html=True)
-    st.link_button("Continue to Baker", url)
+    st.link_button(tr(f"Continue to {APP_SHORT}"), url)
     st.stop()
 
 
@@ -62,17 +63,17 @@ def _show_baker_sign_in_required(*, reason: str | None = None) -> None:
     if from_handoff:
         st.error(
             tr(
-                "Baker sent a sign-in handoff, but Streamlit could not use it "
+                f"{APP_SHORT} sent a sign-in handoff, but Streamlit could not use it "
                 "(expired code or API unreachable). Go back to the dashboard, wait a moment, "
                 "and click Financials again."
             )
         )
     else:
         st.markdown(
-            tr("Open **Financials** from the Baker sidebar (while signed in), or use the button below.")
+            tr(f"Open **Financials** from the {APP_SHORT} sidebar (while signed in), or use the button below.")
         )
-        st.link_button(tr("Open Financials via Baker"), _auth_web_url("/financials/open"), type="primary")
-    st.link_button(tr("Open Baker dashboard"), _auth_web_url("/dashboard"))
+        st.link_button(tr(f"Open Financials via {APP_SHORT}"), _auth_web_url("/financials/open"), type="primary")
+    st.link_button(tr(f"Open {APP_SHORT} dashboard"), _auth_web_url("/dashboard"))
     st.stop()
 
 
@@ -85,9 +86,9 @@ def _show_baker_membership_block(gate: str) -> None:
         "pending": tr("Your organization membership is pending approval."),
         "rejected": tr("Your organization membership request was rejected."),
     }
-    st.warning(labels.get(gate, tr("Your Baker account is not ready for Financials yet.")))
+    st.warning(labels.get(gate, tr(f"Your {APP_SHORT} account is not ready for Financials yet.")))
     paths = {"none": "/onboarding", "pending": "/pending", "rejected": "/rejected"}
-    st.link_button(tr("Continue in Baker"), _auth_web_url(paths.get(gate, "/dashboard")), type="primary")
+    st.link_button(tr(f"Continue in {APP_SHORT}"), _auth_web_url(paths.get(gate, "/dashboard")), type="primary")
     st.stop()
 
 
@@ -347,7 +348,7 @@ def _logout(client) -> None:
 
 
 def main() -> None:
-    st.set_page_config(page_title="Financials", layout="wide", initial_sidebar_state="expanded")
+    st.set_page_config(page_title=f"{APP_SHORT} — Financials", layout="wide", initial_sidebar_state="expanded")
     init_locale_from_query()
     client = _client()
     _try_restore_from_handoff_code(client) or _try_restore_from_query_params(client)
@@ -357,7 +358,7 @@ def main() -> None:
         _show_baker_sign_in_required(
             reason=tr(
                 "No active session was found for this browser. "
-                "Financials must be opened from Baker at least once while signed in."
+                f"Financials must be opened from {APP_SHORT} at least once while signed in."
             ),
         )
 
@@ -367,7 +368,7 @@ def main() -> None:
 
     if not st.session_state.get("access_token"):
         _show_baker_sign_in_required(
-            reason=tr("Your Financials session expired. Click Financials in Baker again."),
+            reason=tr(f"Your Financials session expired. Click Financials in {APP_SHORT} again."),
         )
 
     try:
@@ -389,7 +390,7 @@ def main() -> None:
         st.markdown(
             f'<a href="{_auth_web_url("/dashboard")}" target="_self" style="text-decoration:none;">'
             f'<span style="display:inline-block;padding:0.4rem 1rem;border-radius:0.5rem;'
-            f'border:1px solid #0d9488;color:#0f766e;font-weight:600;">{tr("Back to Baker")}</span></a>',
+            f'border:1px solid #0d9488;color:#0f766e;font-weight:600;">{tr(f"Back to {APP_SHORT}")}</span></a>',
             unsafe_allow_html=True,
         )
         return
@@ -408,7 +409,7 @@ def main() -> None:
         st.markdown(
             f'<a href="{baker_url}" target="_self" style="display:block;width:100%;text-align:center;'
             f'text-decoration:none;padding:0.5rem 1rem;border-radius:0.5rem;border:1px solid #0d9488;'
-            f'color:#0f766e;font-weight:600;background:#f0fdfa;">← {tr("Back to Baker")}</a>',
+            f'color:#0f766e;font-weight:600;background:#f0fdfa;">← {tr(f"Back to {APP_SHORT}")}</a>',
             unsafe_allow_html=True,
         )
         st.radio(

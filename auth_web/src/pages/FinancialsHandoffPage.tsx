@@ -29,7 +29,7 @@ export function FinancialsHandoffPage() {
         const sb = await getSupabase();
         const tokens = await getAuthTokens(sb);
         if (!tokens) {
-          setError("Your Baker session expired. Sign in again, then retry Financials.");
+          setError("Your Ali Al Baker session expired. Sign in again, then retry Financials.");
           return;
         }
         const handoff = await createStreamlitHandoff(tokens);

@@ -45,7 +45,7 @@ async function apiFetch<T>(
     });
   } catch {
     throw new ApiError(
-      "Cannot reach the Baker API. Ensure it is running (port 8000) or use start.py.",
+      "Cannot reach the Ali Al Baker API. Ensure it is running (port 8000) or use start.py.",
       0,
     );
   }

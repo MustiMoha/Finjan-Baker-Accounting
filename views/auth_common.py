@@ -10,6 +10,7 @@ from typing import Callable
 import streamlit as st
 
 import database as db
+from branding import APP_SHORT
 
 _AUTH_CSS_PATH = Path(__file__).resolve().parent.parent / "components" / "auth.css"
 
@@ -68,7 +69,7 @@ def disable_auth_layout() -> None:
 def auth_page_header(*, tagline: str, greeting: str) -> None:
     st.markdown(
         f"""
-<p class="auth-brand">Baker</p>
+<p class="auth-brand">{APP_SHORT}</p>
 <p class="auth-tagline">{tagline}</p>
 <p class="auth-greeting">{greeting}</p>
 """,

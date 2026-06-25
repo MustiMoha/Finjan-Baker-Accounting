@@ -27,7 +27,7 @@ from api.routes.settings import router as settings_router
 from api.routes.streamlit import router as streamlit_router
 from api.routes.translation import router as translation_router
 
-app = FastAPI(title="Baker API", version="0.3.0")
+app = FastAPI(title="Ali Al Baker Accounting Dashboard API", version="0.3.0")
 
 app.include_router(streamlit_router)
 app.include_router(context_router)
