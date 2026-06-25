@@ -1,0 +1,210 @@
+/* Baker auth — sign-in / sign-up only (injected via enable_auth_layout). */
+
+:root {
+  --auth-bg: #e3eaf3;
+  --auth-card-w: 360px;
+  --auth-field-w: 268px;
+  --auth-primary: #1a365d;
+  --auth-primary-hover: #152a47;
+}
+
+html.baker-auth,
+html.baker-auth body,
+html.baker-auth [data-testid="stAppViewContainer"],
+html.baker-auth [data-testid="stMain"],
+html.baker-auth .stApp {
+  background: var(--auth-bg) !important;
+  font-family: "Inter", "DM Sans", "Segoe UI", system-ui, sans-serif !important;
+}
+
+html.baker-auth [data-testid="stSidebar"],
+html.baker-auth [data-testid="collapsedControl"],
+html.baker-auth header[data-testid="stHeader"],
+html.baker-auth [data-testid="stNavigation"],
+html.baker-auth [data-testid="stToolbar"],
+html.baker-auth [data-testid="stDecoration"] {
+  display: none !important;
+}
+
+html.baker-auth [data-testid="stMain"] {
+  padding: 0 !important;
+}
+
+html.baker-auth [data-testid="stMainBlockContainer"] {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  min-height: 100vh !important;
+  padding: 2rem 1rem !important;
+}
+
+html.baker-auth .main .block-container {
+  width: 100% !important;
+  max-width: 100% !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  border: none !important;
+  padding: 0 !important;
+}
+
+/* White card panel */
+html.baker-auth .auth-card-wrap[data-testid="stVerticalBlockBorderWrapper"],
+.auth-card-wrap[data-testid="stVerticalBlockBorderWrapper"] {
+  width: var(--auth-card-w) !important;
+  max-width: calc(100vw - 2rem) !important;
+  margin: 0 auto !important;
+  background: #ffffff !important;
+  border: 1px solid #e8edf2 !important;
+  border-radius: 18px !important;
+  box-shadow: 0 14px 44px rgba(26, 54, 93, 0.11) !important;
+  padding: 2.35rem 0 2rem !important;
+}
+
+html.baker-auth .auth-card-wrap .auth-card-panel-marker,
+.auth-card-wrap .auth-card-panel-marker {
+  display: none !important;
+}
+
+html.baker-auth .auth-brand,
+.auth-brand {
+  font-size: 1.72rem;
+  font-weight: 700;
+  text-align: center;
+  color: #111827;
+  margin: 0 0 0.4rem;
+  letter-spacing: -0.03em;
+}
+
+html.baker-auth .auth-tagline,
+.auth-tagline {
+  text-align: center;
+  color: #6b7280;
+  font-size: 0.86rem;
+  margin: 0 0 1.15rem;
+}
+
+html.baker-auth .auth-greeting,
+.auth-greeting {
+  font-size: 0.98rem;
+  font-weight: 600;
+  color: #111827;
+  margin: 0 0 1rem;
+  text-align: center;
+}
+
+/* Narrow centered form column — matches reference inset fields */
+html.baker-auth .auth-card-wrap .auth-fields-col,
+.auth-card-wrap .auth-fields-col {
+  width: var(--auth-field-w) !important;
+  max-width: calc(100% - 2rem) !important;
+  margin: 0 auto !important;
+}
+
+html.baker-auth .auth-card-wrap .auth-fields-col [data-testid="stForm"],
+.auth-card-wrap .auth-fields-col [data-testid="stForm"] {
+  width: 100% !important;
+  max-width: var(--auth-field-w) !important;
+}
+
+html.baker-auth .auth-card-wrap .auth-fields-col [data-testid="stTextInput"],
+html.baker-auth .auth-card-wrap .auth-fields-col [data-testid="stTextInput"] > div,
+html.baker-auth .auth-card-wrap .auth-fields-col [data-testid="stTextInput"] input,
+.auth-card-wrap .auth-fields-col [data-testid="stTextInput"],
+.auth-card-wrap .auth-fields-col [data-testid="stTextInput"] > div,
+.auth-card-wrap .auth-fields-col [data-testid="stTextInput"] input {
+  width: 100% !important;
+  max-width: var(--auth-field-w) !important;
+}
+
+html.baker-auth .auth-card-wrap .auth-fields-col label[data-testid="stWidgetLabel"],
+.auth-card-wrap .auth-fields-col label[data-testid="stWidgetLabel"] {
+  font-size: 0.8rem !important;
+  font-weight: 400 !important;
+  color: #374151 !important;
+}
+
+html.baker-auth .auth-card-wrap .auth-fields-col [data-testid="stTextInput"] input,
+.auth-card-wrap .auth-fields-col [data-testid="stTextInput"] input {
+  border-radius: 8px !important;
+  border: 1px solid #e5e7eb !important;
+  padding: 0.58rem 0.85rem !important;
+  font-size: 0.88rem !important;
+  min-height: 2.45rem !important;
+  box-sizing: border-box !important;
+}
+
+html.baker-auth .auth-card-wrap .auth-fields-col [data-testid="stTextInput"] input:focus,
+.auth-card-wrap .auth-fields-col [data-testid="stTextInput"] input:focus {
+  border-color: var(--auth-primary) !important;
+  box-shadow: 0 0 0 2px rgba(26, 54, 93, 0.12) !important;
+}
+
+html.baker-auth .auth-card-wrap .auth-fields-col [data-testid="stFormSubmitButton"],
+html.baker-auth .auth-card-wrap .auth-fields-col [data-testid="stFormSubmitButton"] button,
+.auth-card-wrap .auth-fields-col [data-testid="stFormSubmitButton"],
+.auth-card-wrap .auth-fields-col [data-testid="stFormSubmitButton"] button {
+  width: 100% !important;
+  max-width: var(--auth-field-w) !important;
+}
+
+html.baker-auth .auth-card-wrap .auth-fields-col [data-testid="stFormSubmitButton"] button,
+.auth-card-wrap .auth-fields-col [data-testid="stFormSubmitButton"] button {
+  background: var(--auth-primary) !important;
+  color: #fff !important;
+  border: none !important;
+  border-radius: 8px !important;
+  font-weight: 600 !important;
+  min-height: 2.45rem !important;
+}
+
+html.baker-auth .auth-card-wrap .auth-fields-col [data-testid="stFormSubmitButton"] button:hover,
+.auth-card-wrap .auth-fields-col [data-testid="stFormSubmitButton"] button:hover {
+  background: var(--auth-primary-hover) !important;
+}
+
+html.baker-auth .auth-footer,
+.auth-footer {
+  width: var(--auth-field-w);
+  max-width: calc(100% - 2rem);
+  margin: 1.35rem auto 0;
+  text-align: center;
+  font-size: 0.82rem;
+  color: #6b7280;
+}
+
+html.baker-auth .auth-footer a,
+.auth-footer a {
+  color: #111827;
+  text-decoration: underline;
+}
+
+/* Fallback when class hook missing — auth stylesheet only loads on sign-in/up */
+.main .block-container div[data-testid="stVerticalBlockBorderWrapper"] {
+  width: var(--auth-card-w) !important;
+  max-width: calc(100vw - 2rem) !important;
+  margin: 0 auto !important;
+  background: #ffffff !important;
+  border: 1px solid #e8edf2 !important;
+  border-radius: 18px !important;
+  box-shadow: 0 14px 44px rgba(26, 54, 93, 0.11) !important;
+  padding: 2.35rem 0 2rem !important;
+}
+
+.main .block-container .auth-fields-col {
+  width: var(--auth-field-w) !important;
+  max-width: calc(100% - 2rem) !important;
+  margin: 0 auto !important;
+}
+
+.main .block-container .auth-fields-col [data-testid="stTextInput"],
+.main .block-container .auth-fields-col [data-testid="stForm"],
+.main .block-container .auth-fields-col [data-testid="stFormSubmitButton"] {
+  max-width: var(--auth-field-w) !important;
+}
+
+.main .block-container .auth-fields-col [data-testid="stTextInput"] input,
+.main .block-container .auth-fields-col [data-testid="stFormSubmitButton"] button {
+  border-radius: 8px !important;
+  max-width: var(--auth-field-w) !important;
+  box-sizing: border-box !important;
+}
