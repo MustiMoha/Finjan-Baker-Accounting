@@ -32,6 +32,8 @@ type AuthState = {
   setupRequired: boolean;
   streamlitUrl: string;
   signOut: () => Promise<void>;
+  /** Apply Supabase session to React state immediately after sign-in / sign-up. */
+  establishSession: (session: Session) => void;
   refreshGate: (tokens?: AuthTokens) => Promise<GateResult>;
 };
 
@@ -153,6 +155,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setGateChecked(false);
   }, []);
 
+  const establishSession = useCallback((next: Session) => {
+    setSession(next);
+    setUser(next.user ?? null);
+  }, []);
+
   useEffect(() => {
     let cancelled = false;
     let unsubscribe: (() => void) | undefined;
@@ -179,6 +186,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           data: { subscription },
         } = sb.auth.onAuthStateChange((event, nextSession) => {
           if (event === "TOKEN_REFRESHED" && nextSession) {
+            setSession(nextSession);
+            setUser(nextSession.user ?? null);
+            return;
+          }
+          if (event === "SIGNED_IN" && nextSession) {
             setSession(nextSession);
             setUser(nextSession.user ?? null);
             return;
@@ -226,6 +238,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setupRequired,
       streamlitUrl,
       signOut,
+      establishSession,
       refreshGate,
     }),
     [
@@ -240,6 +253,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setupRequired,
       streamlitUrl,
       signOut,
+      establishSession,
       refreshGate,
     ],
   );

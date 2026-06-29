@@ -1,6 +1,7 @@
 // Lazy Supabase client — credentials come from the Python API at runtime.
 
 import { createClient, type Session, type SupabaseClient } from "@supabase/supabase-js";
+import { getApiBase, getSupabaseEnv, missingProductionConfigHint } from "./runtimeConfig";
 
 let client: SupabaseClient | null = null;
 let initPromise: Promise<SupabaseClient> | null = null;
@@ -14,16 +15,17 @@ export async function getSupabase(): Promise<SupabaseClient> {
 }
 
 async function initSupabase(): Promise<SupabaseClient> {
-  const envUrl = import.meta.env.VITE_SUPABASE_URL;
-  const envKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
-
-  let url = envUrl ?? "";
-  let anonKey = envKey ?? "";
+  let { url, anonKey } = getSupabaseEnv();
 
   if (!url || !anonKey) {
-    const res = await fetch("/api/config");
+    const res = await fetch(`${getApiBase()}/api/config`);
     if (!res.ok) {
-      throw new Error("Could not load auth configuration from the server.");
+      const hint = missingProductionConfigHint();
+      throw new Error(
+        hint
+          ? `Could not load auth configuration. ${hint}`
+          : "Could not load auth configuration from the server.",
+      );
     }
     const cfg = (await res.json()) as { supabase_url?: string; supabase_anon_key?: string };
     url = cfg.supabase_url ?? "";
@@ -31,7 +33,12 @@ async function initSupabase(): Promise<SupabaseClient> {
   }
 
   if (!url || !anonKey) {
-    throw new Error("Supabase is not configured. Add credentials to .streamlit/secrets.toml.");
+    const hint = missingProductionConfigHint();
+    throw new Error(
+      hint
+        ? `Supabase is not configured. ${hint}`
+        : "Supabase is not configured. Add credentials to .streamlit/secrets.toml.",
+    );
   }
 
   client = createClient(url, anonKey, {
