@@ -6,7 +6,8 @@ import { Button } from "../components/Button";
 import { InputField } from "../components/InputField";
 import { postLoginPath, useAuth } from "../context/AuthContext";
 import { useT } from "../context/LocaleContext";
-import { getSupabase } from "../lib/supabase";
+import { getSupabase, sessionToTokens } from "../lib/supabase";
+import { formatAuthError } from "../lib/authErrors";
 import { signInSchema, type SignInValues } from "../schemas/auth";
 
 type FieldErrors = Partial<Record<keyof SignInValues, string>>;
@@ -14,7 +15,7 @@ type FieldErrors = Partial<Record<keyof SignInValues, string>>;
 export function SignInPage() {
   const t = useT();
   const navigate = useNavigate();
-  const { refreshGate } = useAuth();
+  const { refreshGate, establishSession } = useAuth();
   const [values, setValues] = useState<SignInValues>({ email: "", password: "" });
   const [errors, setErrors] = useState<FieldErrors>({});
   const [formError, setFormError] = useState<string | null>(null);
@@ -44,11 +45,13 @@ export function SignInPage() {
         password: parsed.data.password,
       });
       if (error) throw error;
+      if (!data.session?.access_token || !data.session.refresh_token) {
+        setFormError("Sign-in succeeded but no session was returned. Confirm your email, then try again.");
+        return;
+      }
 
-      const tokens =
-        data.session?.access_token && data.session.refresh_token
-          ? { accessToken: data.session.access_token, refreshToken: data.session.refresh_token }
-          : undefined;
+      establishSession(data.session);
+      const tokens = sessionToTokens(data.session);
 
       const result = await refreshGate(tokens);
       if (!result.gate) {
@@ -57,7 +60,7 @@ export function SignInPage() {
       }
       navigate(postLoginPath(result.gate, result.setupRequired), { replace: true });
     } catch (err) {
-      setFormError(err instanceof Error ? err.message : "Sign-in failed");
+      setFormError(formatAuthError(err instanceof Error ? err : new Error("Sign-in failed")));
     } finally {
       setLoading(false);
     }

@@ -7,6 +7,7 @@ import { Translated } from "../components/Translated";
 import { postLoginPath, useAuth } from "../context/AuthContext";
 import { useT } from "../context/LocaleContext";
 import { ApiError, patchProfile } from "../lib/api";
+import { formatAuthError } from "../lib/authErrors";
 import { getSupabase, sessionToTokens } from "../lib/supabase";
 import { registerSchema, type RegisterValues } from "../schemas/auth";
 
@@ -15,7 +16,7 @@ type FieldErrors = Partial<Record<keyof RegisterValues, string>>;
 export function RegisterPage() {
   const t = useT();
   const navigate = useNavigate();
-  const { refreshGate } = useAuth();
+  const { refreshGate, establishSession } = useAuth();
   const [values, setValues] = useState<RegisterValues>({
     fullName: "",
     email: "",
@@ -54,10 +55,14 @@ export function RegisterPage() {
       if (error) throw error;
 
       if (!data.session) {
-        setInfo("Check your email to confirm your account, then sign in.");
+        setInfo(
+          "Account created. Check your email to confirm (including spam), then sign in. " +
+            "If email confirmation is disabled in Supabase, try signing in now.",
+        );
         return;
       }
 
+      establishSession(data.session);
       const tokens = sessionToTokens(data.session);
       try {
         await patchProfile(tokens, parsed.data.fullName);
@@ -74,7 +79,11 @@ export function RegisterPage() {
       }
       navigate(postLoginPath(result.gate, result.setupRequired), { replace: true });
     } catch (err) {
-      setFormError(err instanceof Error ? err.message : "Registration failed");
+      if (err instanceof ApiError) {
+        setFormError(err.message);
+      } else {
+        setFormError(formatAuthError(err instanceof Error ? err : new Error("Registration failed")));
+      }
     } finally {
       setLoading(false);
     }

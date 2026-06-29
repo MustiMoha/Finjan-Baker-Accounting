@@ -1,4 +1,5 @@
 import type { MembershipGate } from "../schemas/auth";
+import { getApiBase, missingProductionConfigHint } from "./runtimeConfig";
 import type {
   AccountBucketsDoc,
   AppContext,
@@ -10,7 +11,30 @@ import type {
 } from "../types/app";
 import type { DashboardPayload } from "../types/dashboard";
 
-const API_BASE = import.meta.env.VITE_API_URL || "";
+function apiUrl(path: string): string {
+  const base = getApiBase();
+  return `${base}${path}`;
+}
+
+function parseApiErrorBody(body: unknown, status: number, statusText: string): string {
+  if (typeof body === "object" && body !== null) {
+    const record = body as { detail?: unknown; message?: string };
+    if (typeof record.detail === "string" && record.detail.trim()) return record.detail;
+    if (Array.isArray(record.detail)) {
+      return record.detail
+        .map((d: { msg?: string }) => d.msg)
+        .filter(Boolean)
+        .join(", ");
+    }
+    if (record.message?.trim()) return record.message;
+  }
+  const configHint = missingProductionConfigHint();
+  if (!getApiBase() && !import.meta.env.DEV && status === 200) {
+    return "API misconfigured: set VITE_API_URL on Vercel to your Railway API URL and redeploy.";
+  }
+  if (configHint && status >= 400) return `${statusText || "Request failed"}. ${configHint}`;
+  return statusText || "Request failed";
+}
 
 export type AuthTokens = {
   accessToken: string;
@@ -34,7 +58,7 @@ async function apiFetch<T>(
 ): Promise<T> {
   let res: Response;
   try {
-    res = await fetch(`${API_BASE}${path}`, {
+    res = await fetch(apiUrl(path), {
       ...init,
       headers: {
         Authorization: `Bearer ${tokens.accessToken}`,
@@ -51,14 +75,19 @@ async function apiFetch<T>(
   }
 
   const body = await res.json().catch(() => ({}));
+  if (
+    res.ok &&
+    !getApiBase() &&
+    !import.meta.env.DEV &&
+    typeof body === "object" &&
+    body !== null &&
+    typeof (body as { detail?: string }).detail === "string" &&
+    (body as { detail: string }).detail.toLowerCase().includes("vite_api_url")
+  ) {
+    throw new ApiError((body as { detail: string }).detail, 503);
+  }
   if (!res.ok) {
-    const msg =
-      typeof body.detail === "string"
-        ? body.detail
-        : Array.isArray(body.detail)
-          ? body.detail.map((d: { msg?: string }) => d.msg).join(", ")
-          : body.message || res.statusText;
-    throw new ApiError(msg || "Request failed", res.status);
+    throw new ApiError(parseApiErrorBody(body, res.status, res.statusText), res.status);
   }
   return body as T;
 }
@@ -117,7 +146,7 @@ export async function joinOrganization(
 export async function fetchPublicConfig(): Promise<{
   streamlit_url: string;
 }> {
-  const res = await fetch(`${API_BASE}/api/config`);
+  const res = await fetch(apiUrl("/api/config"));
   if (!res.ok) {
     return { streamlit_url: import.meta.env.VITE_STREAMLIT_URL || "http://127.0.0.1:8501" };
   }
@@ -180,7 +209,7 @@ export async function extractInvoice(
 ): Promise<InvoiceExtractResult> {
   const form = new FormData();
   form.append("file", file);
-  const res = await fetch(`${API_BASE}/api/pending/extract-invoice`, {
+  const res = await fetch(apiUrl("/api/pending/extract-invoice"), {
     method: "POST",
     headers: {
       Authorization: `Bearer ${tokens.accessToken}`,
@@ -351,7 +380,7 @@ export async function uploadWorkbook(tokens: AuthTokens, file: File): Promise<vo
   const form = new FormData();
   form.append("file", file);
   form.append("filename", file.name);
-  const res = await fetch(`${API_BASE}/api/settings/workbook`, {
+  const res = await fetch(apiUrl("/api/settings/workbook"), {
     method: "POST",
     headers: {
       Authorization: `Bearer ${tokens.accessToken}`,
@@ -419,7 +448,7 @@ export async function completeOnboardingSetup(
   form.append("skip_workbook", payload.skipWorkbook ? "true" : "false");
   if (payload.file) form.append("file", payload.file);
 
-  const res = await fetch(`${API_BASE}/api/onboarding/complete`, {
+  const res = await fetch(apiUrl("/api/onboarding/complete"), {
     method: "POST",
     headers: {
       Authorization: `Bearer ${tokens.accessToken}`,
