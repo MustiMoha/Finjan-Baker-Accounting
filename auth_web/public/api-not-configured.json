@@ -1,3 +1,3 @@
 {
-  "detail": "API is not hosted on this domain. On Vercel, set VITE_API_URL to your Railway API URL (e.g. https://your-api.up.railway.app) and redeploy."
+  "detail": "API is not hosted on this domain. On Vercel, set VITE_API_URL to your Fly API URL (e.g. https://ali-al-baker-api.fly.dev) and redeploy."
 }

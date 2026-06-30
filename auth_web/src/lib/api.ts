@@ -30,9 +30,15 @@ function parseApiErrorBody(body: unknown, status: number, statusText: string): s
   }
   const configHint = missingProductionConfigHint();
   if (!getApiBase() && !import.meta.env.DEV && status === 200) {
-    return "API misconfigured: set VITE_API_URL on Vercel to your Railway API URL and redeploy.";
+    return "API misconfigured: set VITE_API_URL on Vercel to your Fly API URL and redeploy.";
   }
   if (configHint && status >= 400) return `${statusText || "Request failed"}. ${configHint}`;
+  if (status === 404) {
+    return (
+      "API route not found (404). On Vercel, set VITE_API_URL to your Fly FastAPI URL " +
+      "(not Streamlit, no /api suffix), then redeploy."
+    );
+  }
   return statusText || "Request failed";
 }
 
@@ -117,7 +123,10 @@ export async function fetchMembershipGate(tokens: AuthTokens): Promise<{
 }
 
 export async function createStreamlitHandoff(tokens: AuthTokens): Promise<{ code: string; url: string }> {
-  return apiFetch<{ code: string; url: string }>("/api/streamlit/handoff", tokens, { method: "POST" });
+  return apiFetch<{ code: string; url: string }>("/api/streamlit/handoff", tokens, {
+    method: "POST",
+    body: "{}",
+  });
 }
 
 export async function createOrganization(

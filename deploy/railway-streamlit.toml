@@ -1,3 +1,4 @@
+# Legacy Railway — use deploy/fly-streamlit.toml instead.
 # Copy to railway.toml at repo root for the Streamlit service (second Railway service).
 
 [build]

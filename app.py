@@ -26,7 +26,7 @@ def _client():
     if not url or not key:
         st.error(
             "Configure SUPABASE_URL and SUPABASE_ANON_KEY "
-            "(Railway env vars or `.streamlit/secrets.toml`)."
+            "(Fly.io env vars or `.streamlit/secrets.toml`)."
         )
         st.stop()
     if "sb" not in st.session_state:

@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
-# Railway Streamlit (Financials) service.
+# Fly.io / Railway Streamlit (Financials) service — Fly: fly deploy --config deploy/fly-streamlit.toml
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT"
 
 mkdir -p .streamlit
 
-# Streamlit reads secrets.toml; on Railway inject the same keys as env vars.
+# Streamlit reads secrets.toml; on Fly/Railway inject the same keys as env vars.
 write_secret() {
   local key="$1"
   local val="${2:-}"

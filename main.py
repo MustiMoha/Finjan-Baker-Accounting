@@ -1,4 +1,4 @@
-"""ASGI entrypoint for Railway / Nixpacks default `uvicorn main:app`."""
+"""ASGI entrypoint for Fly.io / `uvicorn main:app` default."""
 
 from api.main import app
 
