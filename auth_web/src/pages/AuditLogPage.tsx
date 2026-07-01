@@ -6,6 +6,7 @@ import { Section } from "../components/Section";
 import { Translated } from "../components/Translated";
 import { useAuthTokens } from "../hooks/useAuthTokens";
 import { ApiError, fetchOrgAudit, fetchSignInAudit } from "../lib/api";
+import { TablePageSkeleton } from "../components/Skeleton";
 
 export function AuditLogPage() {
   const tokens = useAuthTokens();
@@ -13,6 +14,7 @@ export function AuditLogPage() {
   const [orgRows, setOrgRows] = useState<Record<string, unknown>[]>([]);
   const [signInRows, setSignInRows] = useState<Record<string, unknown>[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [initialLoading, setInitialLoading] = useState(true);
 
   const load = useCallback(async () => {
     if (!tokens) return;
@@ -23,12 +25,18 @@ export function AuditLogPage() {
       setError(null);
     } catch (err) {
       setError(err instanceof ApiError ? err.message : "Could not load audit log");
+    } finally {
+      setInitialLoading(false);
     }
   }, [tokens]);
 
   useEffect(() => {
     void load();
   }, [load]);
+
+  if (initialLoading) {
+    return <TablePageSkeleton tabs />;
+  }
 
   return (
     <div>

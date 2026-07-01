@@ -23,6 +23,30 @@ export function getStreamlitUrlFallback(): string {
   return import.meta.env.VITE_STREAMLIT_URL?.trim() || "http://127.0.0.1:8501";
 }
 
+export type PublicConfig = {
+  streamlit_url: string;
+  auth_web_url?: string;
+  supabase_url?: string;
+  supabase_anon_key?: string;
+};
+
+let publicConfigPromise: Promise<PublicConfig> | null = null;
+
+/** Single shared /api/config fetch for Supabase init and AuthContext. */
+export function fetchPublicConfigCached(): Promise<PublicConfig> {
+  if (!publicConfigPromise) {
+    publicConfigPromise = fetch(`${getApiBase()}/api/config`)
+      .then(async (res) => {
+        if (!res.ok) {
+          return { streamlit_url: getStreamlitUrlFallback() };
+        }
+        return (await res.json()) as PublicConfig;
+      })
+      .catch(() => ({ streamlit_url: getStreamlitUrlFallback() }));
+  }
+  return publicConfigPromise;
+}
+
 export function getSupabaseEnv(): { url: string; anonKey: string } {
   return {
     url: import.meta.env.VITE_SUPABASE_URL?.trim() || "",

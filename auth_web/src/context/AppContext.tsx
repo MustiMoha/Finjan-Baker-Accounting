@@ -8,7 +8,7 @@ import {
   type ReactNode,
 } from "react";
 import { ApiError, fetchAppContext } from "../lib/api";
-import { getAuthTokens } from "../lib/authSession";
+import { prefetchDashboard } from "../lib/dashboardPrefetch";
 import type { AppContext } from "../types/app";
 import { getSupabase } from "../lib/supabase";
 import { useAuth } from "./AuthContext";
@@ -31,31 +31,32 @@ export function AppContextProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const reload = useCallback(async (): Promise<AppContext | null> => {
+  const reload = useCallback(async (opts?: { silent?: boolean }): Promise<AppContext | null> => {
     if (!accessToken || !refreshToken) {
       setCtx(null);
       setLoading(false);
       setError(null);
       return null;
     }
-    setLoading(true);
+    if (!opts?.silent) {
+      setLoading(true);
+    }
     setError(null);
     try {
-      const sb = await getSupabase();
-      const tokens = await getAuthTokens(sb, { accessToken, refreshToken });
-      if (!tokens) {
-        throw new ApiError("Not signed in", 401);
-      }
-
+      const tokens = { accessToken, refreshToken };
       const load = (t: typeof tokens) => fetchAppContext(t);
       try {
         const data = await load(tokens);
         setCtx(data);
+        if (data.permissions.can_dashboard) {
+          void prefetchDashboard(tokens);
+        }
         return data;
       } catch (err) {
         if (!(err instanceof ApiError) || err.status !== 401) {
           throw err;
         }
+        const sb = await getSupabase();
         const { data: refreshed, error: refreshErr } = await sb.auth.refreshSession();
         if (
           refreshErr ||
@@ -70,6 +71,9 @@ export function AppContextProvider({ children }: { children: ReactNode }) {
         };
         const data = await load(retry);
         setCtx(data);
+        if (data.permissions.can_dashboard) {
+          void prefetchDashboard(retry);
+        }
         return data;
       }
     } catch (err) {
@@ -78,7 +82,9 @@ export function AppContextProvider({ children }: { children: ReactNode }) {
       setCtx(null);
       return null;
     } finally {
-      setLoading(false);
+      if (!opts?.silent) {
+        setLoading(false);
+      }
     }
   }, [accessToken, refreshToken]);
 
@@ -89,9 +95,9 @@ export function AppContextProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (!accessToken || !refreshToken) return;
     const poll = () => {
-      if (document.visibilityState === "visible") void reload();
+      if (document.visibilityState === "visible") void reload({ silent: true });
     };
-    const id = window.setInterval(poll, 12000);
+    const id = window.setInterval(poll, 60_000);
     return () => window.clearInterval(id);
   }, [accessToken, refreshToken, reload]);
 

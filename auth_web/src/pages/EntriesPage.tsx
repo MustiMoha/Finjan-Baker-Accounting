@@ -19,6 +19,7 @@ import {
   fetchMyPending,
 } from "../lib/api";
 import type { InvoiceExtractResult, PendingTransaction } from "../types/app";
+import { EntriesPageSkeleton } from "../components/Skeleton";
 
 type JournalLine = { account: string; debit: string; credit: string };
 
@@ -42,6 +43,7 @@ export function EntriesPage() {
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [initialLoading, setInitialLoading] = useState(true);
 
   useEffect(() => {
     setCurrency(displayCurrency);
@@ -54,6 +56,8 @@ export function EntriesPage() {
       setRecent(rows.filter((r) => r.status === "pending"));
     } catch {
       /* ignore */
+    } finally {
+      setInitialLoading(false);
     }
   }, [tokens]);
 
@@ -123,6 +127,10 @@ export function EntriesPage() {
       setBusy(false);
     }
   };
+
+  if (initialLoading) {
+    return <EntriesPageSkeleton />;
+  }
 
   return (
     <div>

@@ -7,6 +7,7 @@ import { Translated } from "../components/Translated";
 import { useAuthTokens } from "../hooks/useAuthTokens";
 import { ApiError, approveMember, fetchPendingMembers, rejectMember } from "../lib/api";
 import type { OrgMember } from "../types/app";
+import { TablePageSkeleton } from "../components/Skeleton";
 
 export function MemberApprovalsPage() {
   const tokens = useAuthTokens();
@@ -15,6 +16,7 @@ export function MemberApprovalsPage() {
   const [leadFlags, setLeadFlags] = useState<Record<string, boolean>>({});
   const [error, setError] = useState<string | null>(null);
   const [busyId, setBusyId] = useState<string | null>(null);
+  const [initialLoading, setInitialLoading] = useState(true);
 
   const load = useCallback(async () => {
     if (!tokens) return;
@@ -32,12 +34,18 @@ export function MemberApprovalsPage() {
       setError(null);
     } catch (err) {
       setError(err instanceof ApiError ? err.message : "Could not load pending members");
+    } finally {
+      setInitialLoading(false);
     }
   }, [tokens]);
 
   useEffect(() => {
     void load();
   }, [load]);
+
+  if (initialLoading) {
+    return <TablePageSkeleton />;
+  }
 
   return (
     <div>

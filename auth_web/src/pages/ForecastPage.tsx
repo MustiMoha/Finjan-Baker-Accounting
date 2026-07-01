@@ -5,11 +5,11 @@ import { InputField } from "../components/InputField";
 import { PageHeader } from "../components/PageHeader";
 import { Section } from "../components/Section";
 import { Translated } from "../components/Translated";
-import { useT } from "../context/LocaleContext";
 import { useAuthTokens } from "../hooks/useAuthTokens";
 import { ApiError, fetchForecastConfig, fetchForecastPreview, patchForecastConfig } from "../lib/api";
 import { formatMoney } from "../lib/charts";
 import type { FinancialForecastPayload, ForecastAssumption, ForecastConfig } from "../types/dashboard";
+import { ForecastPageSkeleton } from "../components/Skeleton";
 
 function newAssumptionId() {
   return `assumption-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
@@ -163,13 +163,13 @@ function MethodToggles({
 }
 
 export function ForecastPage() {
-  const t = useT();
   const tokens = useAuthTokens();
   const [cfg, setCfg] = useState<ForecastConfig | null>(null);
   const [preview, setPreview] = useState<FinancialForecastPayload | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [initialLoading, setInitialLoading] = useState(true);
 
   const load = useCallback(async () => {
     if (!tokens) return;
@@ -181,6 +181,8 @@ export function ForecastPage() {
       setError(null);
     } catch (err) {
       setError(err instanceof ApiError ? err.message : "Could not load forecast settings");
+    } finally {
+      setInitialLoading(false);
     }
   }, [tokens]);
 
@@ -218,8 +220,12 @@ export function ForecastPage() {
     }
   };
 
+  if (initialLoading && !cfg) {
+    return <ForecastPageSkeleton />;
+  }
+
   if (!cfg) {
-    return <p className="text-sm text-slate-500">{t("common.loading")}</p>;
+    return null;
   }
 
   const prefix = preview?.currency_prefix ?? "";

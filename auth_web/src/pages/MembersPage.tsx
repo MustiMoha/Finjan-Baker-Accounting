@@ -7,6 +7,7 @@ import { Translated } from "../components/Translated";
 import { useAuthTokens } from "../hooks/useAuthTokens";
 import { ApiError, fetchMembers, updateMember } from "../lib/api";
 import type { OrgMember } from "../types/app";
+import { TablePageSkeleton } from "../components/Skeleton";
 
 export function MembersPage() {
   const tokens = useAuthTokens();
@@ -14,6 +15,7 @@ export function MembersPage() {
   const [error, setError] = useState<string | null>(null);
   const [drafts, setDrafts] = useState<Record<string, { org_role: string; can_approve: boolean }>>({});
   const [busyId, setBusyId] = useState<string | null>(null);
+  const [initialLoading, setInitialLoading] = useState(true);
 
   const load = useCallback(async () => {
     if (!tokens) return;
@@ -29,6 +31,8 @@ export function MembersPage() {
       setError(null);
     } catch (err) {
       setError(err instanceof ApiError ? err.message : "Could not load members");
+    } finally {
+      setInitialLoading(false);
     }
   }, [tokens]);
 
@@ -53,6 +57,10 @@ export function MembersPage() {
       setBusyId(null);
     }
   };
+
+  if (initialLoading) {
+    return <TablePageSkeleton />;
+  }
 
   return (
     <div>

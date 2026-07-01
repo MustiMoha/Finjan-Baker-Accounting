@@ -1,8 +1,10 @@
 import { Navigate, Outlet } from "react-router-dom";
 import { Button } from "../components/Button";
 import { Translated } from "../components/Translated";
+import { useAuth } from "../context/AuthContext";
 import { useT } from "../context/LocaleContext";
 import { useAppContext } from "../context/AppContext";
+import { WorkspacePageSkeleton } from "../components/Skeleton";
 
 function LoadErrorPanel({ message, onRetry }: { message: string; onRetry: () => void }) {
   const t = useT();
@@ -24,14 +26,15 @@ function LoadErrorPanel({ message, onRetry }: { message: string; onRetry: () => 
 }
 
 export function SetupCompleteGuard() {
+  const { setupRequired } = useAuth();
   const { ctx, loading, error, reload } = useAppContext();
 
+  if (setupRequired) {
+    return <Navigate to="/onboarding/setup" replace />;
+  }
+
   if (loading && !ctx) {
-    return (
-      <div className="flex min-h-[40vh] items-center justify-center text-sm text-slate-500">
-        <Translated text="Loading workspace…" />
-      </div>
-    );
+    return <WorkspacePageSkeleton />;
   }
 
   if (error && !ctx) {

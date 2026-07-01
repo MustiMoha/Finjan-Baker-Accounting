@@ -1,5 +1,5 @@
 import type { MembershipGate } from "../schemas/auth";
-import { getApiBase, missingProductionConfigHint } from "./runtimeConfig";
+import { fetchPublicConfigCached, getApiBase, missingProductionConfigHint } from "./runtimeConfig";
 import type {
   AccountBucketsDoc,
   AppContext,
@@ -155,11 +155,8 @@ export async function joinOrganization(
 export async function fetchPublicConfig(): Promise<{
   streamlit_url: string;
 }> {
-  const res = await fetch(apiUrl("/api/config"));
-  if (!res.ok) {
-    return { streamlit_url: import.meta.env.VITE_STREAMLIT_URL || "http://127.0.0.1:8501" };
-  }
-  return res.json();
+  const cfg = await fetchPublicConfigCached();
+  return { streamlit_url: cfg.streamlit_url };
 }
 
 export async function fetchDashboard(

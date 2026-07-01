@@ -1,12 +1,9 @@
 import { Navigate, Outlet } from "react-router-dom";
+import { CenteredPageSkeleton } from "../components/Skeleton";
 import { useAuth } from "../context/AuthContext";
 
 function AuthLoading({ label = "Loading…" }: { label?: string }) {
-  return (
-    <div className="flex min-h-screen items-center justify-center bg-slate-50 text-sm text-slate-500">
-      {label}
-    </div>
-  );
+  return <CenteredPageSkeleton label={label} />;
 }
 
 function GateErrorPanel({

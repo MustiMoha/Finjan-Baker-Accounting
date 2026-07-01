@@ -3,6 +3,7 @@ import { useAuth } from "../context/AuthContext";
 import { useLocale, useT } from "../context/LocaleContext";
 import { useReloadOnWindowFocus } from "../hooks/useReloadOnWindowFocus";
 import { ApiError, fetchDashboard } from "../lib/api";
+import { consumeDashboardPrefetch } from "../lib/dashboardPrefetch";
 import {
   BAKER_ROSE,
   BAKER_SLATE,
@@ -16,6 +17,7 @@ import {
   formatMoney,
 } from "../lib/charts";
 import type { DashboardPayload } from "../types/dashboard";
+import { DashboardPageSkeleton } from "../components/Skeleton";
 
 function MetricCard({
   label,
@@ -76,10 +78,17 @@ export function DashboardPage({ mode }: { mode: DashboardMode }) {
         setError(null);
       }
       try {
-        const res = await fetchDashboard(tokens, {
-          currencyView,
-          currencies: selectedCurrencies.length ? selectedCurrencies : undefined,
-        });
+        const res = await consumeDashboardPrefetch(
+          tokens,
+          () =>
+            fetchDashboard(tokens, {
+              currencyView,
+              currencies: selectedCurrencies.length ? selectedCurrencies : undefined,
+            }),
+          {
+            allow: currencyView === "original" && selectedCurrencies.length === 0,
+          },
+        );
         setData(res);
         if (opts?.silent) {
           setError(null);
@@ -165,7 +174,7 @@ export function DashboardPage({ mode }: { mode: DashboardMode }) {
   }, [filteredForecast, forecastScenario]);
 
   if (loading && !data) {
-    return <p className="text-sm text-slate-500">{t("dashboard.loading")}</p>;
+    return <DashboardPageSkeleton />;
   }
 
   if (error && !data) {

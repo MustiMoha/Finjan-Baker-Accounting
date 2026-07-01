@@ -6,11 +6,12 @@ import { Modal } from "../components/Modal";
 import { PageHeader } from "../components/PageHeader";
 import { Section } from "../components/Section";
 import { Translated } from "../components/Translated";
-import { useLocale, useT } from "../context/LocaleContext";
+import { useLocale } from "../context/LocaleContext";
 import { useAuthTokens } from "../hooks/useAuthTokens";
 import { useEffectivePermissions } from "../hooks/useEffectivePermissions";
 import { ApiError, fetchAccountantHome, patchAccountantThresholds } from "../lib/api";
 import type { AccountantHomePayload, AccountantRatio } from "../types/app";
+import { AccountantHomePageSkeleton } from "../components/Skeleton";
 
 const THRESHOLD_KEYS = [
   "current_ratio",
@@ -79,7 +80,6 @@ function RatioCard({
 }
 
 export function AccountantHomePage() {
-  const t = useT();
   const { locale, translateText, prefetchTexts } = useLocale();
   const tokens = useAuthTokens();
   const { permissions } = useEffectivePermissions();
@@ -89,6 +89,7 @@ export function AccountantHomePage() {
   const [draft, setDraft] = useState<Record<string, { min: string; max: string }>>({});
   const [busy, setBusy] = useState(false);
   const [ratioModal, setRatioModal] = useState<{ key: string; ratio: AccountantRatio } | null>(null);
+  const [initialLoading, setInitialLoading] = useState(true);
 
   const load = useCallback(async () => {
     if (!tokens) return;
@@ -107,6 +108,8 @@ export function AccountantHomePage() {
       setError(null);
     } catch (err) {
       setError(err instanceof ApiError ? err.message : "Could not load accountant home");
+    } finally {
+      setInitialLoading(false);
     }
   }, [tokens]);
 
@@ -169,8 +172,8 @@ export function AccountantHomePage() {
     prefetchTexts(texts);
   }, [locale, data, subtitle, prefetchTexts]);
 
-  if (!data && !error) {
-    return <p className="text-sm text-slate-500">{t("common.loading")}</p>;
+  if (initialLoading && !data && !error) {
+    return <AccountantHomePageSkeleton />;
   }
 
   return (
