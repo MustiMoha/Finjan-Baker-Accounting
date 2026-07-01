@@ -1,73 +1,61 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, Navigate } from "react-router-dom";
 import { Translated } from "../components/Translated";
 import { useAuth } from "../context/AuthContext";
-import { useLocale, useT } from "../context/LocaleContext";
-import { useEffectivePermissions } from "../hooks/useEffectivePermissions";
+import { useLocale } from "../context/LocaleContext";
 import { ApiError, createStreamlitHandoff } from "../lib/api";
-import { getAuthTokens } from "../lib/authSession";
-import { getSupabase } from "../lib/supabase";
+import { HandoffPageSkeleton } from "../components/Skeleton";
 
 /** Mint a one-time handoff code and redirect to Streamlit Financials. */
 export function FinancialsHandoffPage() {
-  const t = useT();
   const { locale } = useLocale();
   const { session, loading: authLoading } = useAuth();
-  const { permissions, loading } = useEffectivePermissions();
   const [error, setError] = useState<string | null>(null);
-  const started = useRef(false);
+  const [attempt, setAttempt] = useState(0);
 
   useEffect(() => {
-    if (!session) return;
-    if (loading) return;
-    if (permissions && !permissions.can_financials) return;
-    if (started.current) return;
-    started.current = true;
+    if (!session?.access_token || !session.refresh_token) return;
+    setError(null);
+
+    const tokens = {
+      accessToken: session.access_token,
+      refreshToken: session.refresh_token,
+    };
+
+    let cancelled = false;
 
     (async () => {
       try {
-        const sb = await getSupabase();
-        const tokens = await getAuthTokens(sb);
-        if (!tokens) {
-          setError("Your Ali Al Baker session expired. Sign in again, then retry Financials.");
-          return;
-        }
         const handoff = await createStreamlitHandoff(tokens);
+        if (cancelled) return;
         const url = new URL(handoff.url);
         url.searchParams.set("locale", locale);
         window.location.assign(url.toString());
       } catch (err) {
+        if (cancelled) return;
+        if (err instanceof ApiError && err.status === 403) {
+          setError("Your role does not include Financials.");
+          return;
+        }
         setError(err instanceof ApiError ? err.message : "Could not open Financials.");
       }
     })();
-  }, [session, permissions, loading]);
+
+    return () => {
+      cancelled = true;
+    };
+  }, [session, locale, attempt]);
 
   if (authLoading) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-slate-50 text-sm text-slate-500">
-        {t("common.loading")}
-      </div>
-    );
+    return <HandoffPageSkeleton />;
   }
 
   if (!session) {
     return <Navigate to="/sign-in" replace />;
   }
 
-  if (!loading && permissions && !permissions.can_financials) {
-    return (
-      <div className="flex min-h-screen flex-col items-center justify-center gap-4 bg-slate-50 p-6">
-        <p className="text-sm text-slate-600">
-          <Translated text="Your role does not include Financials." />
-        </p>
-        <Link to="/dashboard" className="text-sm font-medium text-baker-teal hover:underline">
-          <Translated text="Back to dashboard" />
-        </Link>
-      </div>
-    );
-  }
-
   if (error) {
+    const isPermission = error === "Your role does not include Financials.";
     return (
       <div className="flex min-h-screen flex-col items-center justify-center gap-4 bg-slate-50 p-6">
         <p className="max-w-md text-center text-sm text-red-700">
@@ -76,13 +64,18 @@ export function FinancialsHandoffPage() {
         <Link to="/dashboard" className="text-sm font-medium text-baker-teal hover:underline">
           <Translated text="Back to dashboard" />
         </Link>
+        {isPermission ? null : (
+          <button
+            type="button"
+            className="text-sm text-slate-500 underline"
+            onClick={() => setAttempt((n) => n + 1)}
+          >
+            <Translated text="Retry" />
+          </button>
+        )}
       </div>
     );
   }
 
-  return (
-    <div className="flex min-h-screen items-center justify-center bg-slate-50 text-sm text-slate-500">
-      <Translated text="Opening Financials…" />
-    </div>
-  );
+  return <HandoffPageSkeleton />;
 }

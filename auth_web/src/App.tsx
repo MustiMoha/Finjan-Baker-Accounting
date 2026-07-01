@@ -2,7 +2,6 @@ import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
 import { LocaleProvider } from "./context/LocaleContext";
 import { RolePreviewProvider } from "./context/RolePreviewContext";
-import { useT } from "./context/LocaleContext";
 import { useEffectivePermissions } from "./hooks/useEffectivePermissions";
 import { AppShell, HomeRedirect, RequirePermission } from "./layouts/AppShell";
 import { AccountClassificationPage } from "./pages/AccountClassificationPage";
@@ -26,12 +25,12 @@ import { FinancialsHandoffPage } from "./pages/FinancialsHandoffPage";
 import { ActiveMemberRoute, GuestRoute, ProtectedRoute } from "./routes/AuthRoutes";
 import { AppContextLayout } from "./routes/AppContextLayout";
 import { SetupCompleteGuard } from "./routes/SetupGuard";
+import { DashboardPageSkeleton } from "./components/Skeleton";
 
 function GatedDashboard() {
-  const t = useT();
   const { permissions, loading, error, reload } = useEffectivePermissions();
   if (loading && !permissions) {
-    return <p className="text-sm text-slate-500">{t("dashboard.loading")}</p>;
+    return <DashboardPageSkeleton />;
   }
   if (error && !permissions) {
     return (
@@ -161,8 +160,8 @@ export default function App() {
             </Route>
 
             <Route element={<ActiveMemberRoute />}>
+              <Route path="/financials/open" element={<FinancialsHandoffPage />} />
               <Route element={<AppContextLayout />}>
-                <Route path="/financials/open" element={<FinancialsHandoffPage />} />
                 <Route path="/onboarding/setup" element={<OnboardingSetupPage />} />
                 <Route element={<SetupCompleteGuard />}>
                   <Route element={<AppShell />}>

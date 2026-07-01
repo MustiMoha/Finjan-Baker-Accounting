@@ -352,7 +352,8 @@ def main() -> None:
     init_locale_from_query()
     client = _client()
     _try_restore_from_handoff_code(client) or _try_restore_from_query_params(client)
-    _ensure_auth_from_cookies(client)
+    if not st.session_state.get("access_token"):
+        _ensure_auth_from_cookies(client)
 
     if not st.session_state.get("access_token"):
         _show_baker_sign_in_required(
@@ -425,7 +426,8 @@ def main() -> None:
         if st.button(tr("Sign out"), width="stretch"):
             _logout(client)
 
-    gl_wb.mark_financials_navigation_and_refresh_workbook(client, dict(st.secrets))
+    with st.spinner(tr("Loading workbook…")):
+        gl_wb.mark_financials_navigation_and_refresh_workbook(client, dict(st.secrets))
     financials.render(client)
 
 

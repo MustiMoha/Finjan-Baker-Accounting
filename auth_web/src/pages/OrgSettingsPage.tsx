@@ -4,13 +4,12 @@ import { Button } from "../components/Button";
 import { PageHeader } from "../components/PageHeader";
 import { Section } from "../components/Section";
 import { Translated, useTranslatedString } from "../components/Translated";
-import { useT } from "../context/LocaleContext";
 import { useAuthTokens } from "../hooks/useAuthTokens";
 import { ApiError, fetchOrgSettings, transferOwnership } from "../lib/api";
 import type { OrgSettings } from "../types/app";
+import { OrgSettingsPageSkeleton } from "../components/Skeleton";
 
 export function OrgSettingsPage() {
-  const t = useT();
   const selectOwnerLabel = useTranslatedString("Select new owner…");
   const tokens = useAuthTokens();
   const [data, setData] = useState<OrgSettings | null>(null);
@@ -19,6 +18,7 @@ export function OrgSettingsPage() {
   const [newOwner, setNewOwner] = useState("");
   const [confirm, setConfirm] = useState(false);
   const [busy, setBusy] = useState(false);
+  const [initialLoading, setInitialLoading] = useState(true);
 
   const load = useCallback(async () => {
     if (!tokens) return;
@@ -27,6 +27,8 @@ export function OrgSettingsPage() {
       setError(null);
     } catch (err) {
       setError(err instanceof ApiError ? err.message : "Could not load organization");
+    } finally {
+      setInitialLoading(false);
     }
   }, [tokens]);
 
@@ -50,8 +52,8 @@ export function OrgSettingsPage() {
     }
   };
 
-  if (!data && !error) {
-    return <p className="text-sm text-slate-500">{t("common.loading")}</p>;
+  if (initialLoading && !data && !error) {
+    return <OrgSettingsPageSkeleton />;
   }
 
   return (

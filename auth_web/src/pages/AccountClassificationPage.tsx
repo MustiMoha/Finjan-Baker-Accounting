@@ -9,6 +9,7 @@ import { useAuthTokens } from "../hooks/useAuthTokens";
 import { ApiError, fetchAccountantBuckets, patchAccountantBuckets } from "../lib/api";
 import { foldBucketKey, pickLongerDisplayName } from "../lib/foldBucketKey";
 import type { AccountBucket, AccountBucketMapping, AccountBucketsDoc } from "../types/app";
+import { ClassificationPageSkeleton } from "../components/Skeleton";
 
 const NEW_BUCKET = "__new__";
 const CATEGORIES = ["asset", "liability", "equity", "revenue", "expense"] as const;
@@ -70,6 +71,7 @@ export function AccountClassificationPage() {
   const [error, setError] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [initialLoading, setInitialLoading] = useState(true);
 
   const load = useCallback(async () => {
     if (!tokens) return;
@@ -87,6 +89,8 @@ export function AccountClassificationPage() {
       setError(null);
     } catch (err) {
       setError(err instanceof ApiError ? err.message : "Could not load classification rules");
+    } finally {
+      setInitialLoading(false);
     }
   }, [tokens]);
 
@@ -215,6 +219,10 @@ export function AccountClassificationPage() {
       ),
     );
   };
+
+  if (initialLoading && !buckets.length && !error) {
+    return <ClassificationPageSkeleton />;
+  }
 
   return (
     <div className="mx-auto max-w-5xl space-y-6">

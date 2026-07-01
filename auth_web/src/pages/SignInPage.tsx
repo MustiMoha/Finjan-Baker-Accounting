@@ -1,5 +1,5 @@
 import { Translated } from "../components/Translated";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { AuthLayout } from "../components/AuthLayout";
 import { Button } from "../components/Button";
@@ -8,6 +8,7 @@ import { postLoginPath, useAuth } from "../context/AuthContext";
 import { useT } from "../context/LocaleContext";
 import { getSupabase, sessionToTokens } from "../lib/supabase";
 import { formatAuthError } from "../lib/authErrors";
+import { fetchPublicConfigCached } from "../lib/runtimeConfig";
 import { signInSchema, type SignInValues } from "../schemas/auth";
 
 type FieldErrors = Partial<Record<keyof SignInValues, string>>;
@@ -20,6 +21,11 @@ export function SignInPage() {
   const [errors, setErrors] = useState<FieldErrors>({});
   const [formError, setFormError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    void fetchPublicConfigCached();
+    void getSupabase();
+  }, []);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();

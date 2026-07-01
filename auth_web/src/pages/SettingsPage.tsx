@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { Label } from "../components/Label";
 import { Translated } from "../components/Translated";
-import { useT } from "../context/LocaleContext";
 import { Alert } from "../components/Alert";
 import { Button } from "../components/Button";
 import { ToastStack } from "../components/ToastStack";
@@ -25,6 +24,7 @@ import {
 } from "../lib/api";
 import { formatFxRatesJson } from "../lib/fxRates";
 import type { AppSettings } from "../types/app";
+import { SettingsPageSkeleton } from "../components/Skeleton";
 
 const MONTHS = [
   "January",
@@ -132,6 +132,7 @@ export function SettingsPage() {
   const [fullName, setFullName] = useState("");
   const [profileEmail, setProfileEmail] = useState("");
   const [workbookPick, setWorkbookPick] = useState<string | null>(null);
+  const [initialLoading, setInitialLoading] = useState(true);
 
   const load = useCallback(async () => {
     if (!tokens) return;
@@ -153,6 +154,8 @@ export function SettingsPage() {
       setError(null);
     } catch (err) {
       setError(err instanceof ApiError ? err.message : "Could not load settings");
+    } finally {
+      setInitialLoading(false);
     }
   }, [tokens]);
 
@@ -160,9 +163,8 @@ export function SettingsPage() {
     void load();
   }, [load]);
 
-  const t = useT();
-  if (!settings && !error) {
-    return <p className="text-sm text-slate-500">{t("common.loading")}</p>;
+  if (initialLoading && !settings && !error) {
+    return <SettingsPageSkeleton />;
   }
 
   return (

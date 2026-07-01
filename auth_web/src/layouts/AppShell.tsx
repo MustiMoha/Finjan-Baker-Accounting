@@ -7,7 +7,9 @@ import { useAuth } from "../context/AuthContext";
 import { useT } from "../context/LocaleContext";
 import { useEffectivePermissions } from "../hooks/useEffectivePermissions";
 import { homePathForRole } from "../lib/roles";
+import { canUseRolePreview } from "../lib/devAccess";
 import { LoadErrorPanel } from "../routes/SetupGuard";
+import { SidebarNavSkeleton, WorkspacePageSkeleton } from "../components/Skeleton";
 import type { ViewRole } from "../types/app";
 
 const SIDEBAR_COLLAPSED_KEY = "baker.sidebarCollapsed";
@@ -100,6 +102,7 @@ export function AppShell() {
   const { ctx, loading, error, reload, permissions, viewRole, previewRole, setPreviewRole, isPreviewing } =
     useEffectivePermissions();
   const p = permissions;
+  const showRolePreview = canUseRolePreview(user?.email);
 
   const hasNav =
     p &&
@@ -158,31 +161,33 @@ export function AppShell() {
           <LanguageToggle />
         </div>
 
-        <div className="mb-4 rounded-lg border border-gray-100 bg-slate-50 p-3">
-          <p className="mb-2 text-xs font-semibold text-slate-500">{t("nav.viewAs")}</p>
-          <div className="flex rounded-lg border border-gray-200 bg-white p-0.5">
-            {PREVIEW_OPTIONS.map((opt) => {
-              const active = (previewRole ?? ctx?.view_role) === opt.id;
-              return (
-                <button
-                  key={opt.id}
-                  type="button"
-                  onClick={() =>
-                    setPreviewRole(opt.id === ctx?.view_role ? null : opt.id)
-                  }
-                  className={`flex-1 rounded-md px-1 py-1.5 text-xs font-medium transition ${
-                    active ? "bg-baker-teal text-white" : "text-slate-600 hover:bg-slate-50"
-                  }`}
-                >
-                  {t(opt.labelKey)}
-                </button>
-              );
-            })}
+        {showRolePreview ? (
+          <div className="mb-4 rounded-lg border border-gray-100 bg-slate-50 p-3">
+            <p className="mb-2 text-xs font-semibold text-slate-500">{t("nav.viewAs")}</p>
+            <div className="flex rounded-lg border border-gray-200 bg-white p-0.5">
+              {PREVIEW_OPTIONS.map((opt) => {
+                const active = (previewRole ?? ctx?.view_role) === opt.id;
+                return (
+                  <button
+                    key={opt.id}
+                    type="button"
+                    onClick={() =>
+                      setPreviewRole(opt.id === ctx?.view_role ? null : opt.id)
+                    }
+                    className={`flex-1 rounded-md px-1 py-1.5 text-xs font-medium transition ${
+                      active ? "bg-baker-teal text-white" : "text-slate-600 hover:bg-slate-50"
+                    }`}
+                  >
+                    {t(opt.labelKey)}
+                  </button>
+                );
+              })}
+            </div>
+            <p className="mt-2 text-[10px] leading-snug text-slate-400">{t("nav.previewNavOnly")}</p>
           </div>
-          <p className="mt-2 text-[10px] leading-snug text-slate-400">{t("nav.previewNavOnly")}</p>
-        </div>
+        ) : null}
 
-        {isPreviewing ? (
+        {showRolePreview && isPreviewing ? (
           <div className="mb-4 rounded-lg border border-sky-200 bg-sky-50 px-3 py-2 text-xs text-sky-900">
             {t("nav.previewingAs")} <strong>{viewRole}</strong>
             <button
@@ -196,7 +201,7 @@ export function AppShell() {
         ) : null}
 
         {loading && !ctx ? (
-          <p className="px-3 text-xs text-slate-400">{t("nav.loadingMenu")}</p>
+          <SidebarNavSkeleton />
         ) : error && !ctx ? (
           <div className="px-2">
             <LoadErrorPanel message={error} onRetry={() => void reload()} />
@@ -325,9 +330,8 @@ export function RequirePermission({
   allowed: boolean | undefined;
   children: React.ReactNode;
 }) {
-  const t = useT();
   if (allowed === undefined) {
-    return <p className="text-sm text-slate-500">{t("common.loading")}</p>;
+    return <WorkspacePageSkeleton />;
   }
   if (!allowed) {
     return <Navigate to="/" replace />;
@@ -336,14 +340,9 @@ export function RequirePermission({
 }
 
 export function HomeRedirect() {
-  const t = useT();
   const { permissions, loading, error, reload } = useEffectivePermissions();
   if (loading && !permissions) {
-    return (
-      <div className="flex min-h-[40vh] items-center justify-center text-sm text-slate-500">
-        {t("common.loading")}
-      </div>
-    );
+    return <WorkspacePageSkeleton />;
   }
   if (error && !permissions) {
     return (

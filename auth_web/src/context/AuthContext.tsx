@@ -11,6 +11,7 @@ import {
 import type { Session, SupabaseClient, User } from "@supabase/supabase-js";
 import { ApiError, fetchMembershipGate, type AuthTokens } from "../lib/api";
 import { getAuthTokens } from "../lib/authSession";
+import { fetchPublicConfigCached, getStreamlitUrlFallback } from "../lib/runtimeConfig";
 import { getSupabase, sessionToTokens } from "../lib/supabase";
 import type { MembershipGate } from "../schemas/auth";
 
@@ -49,9 +50,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [gate, setGate] = useState<MembershipGate | null>(null);
   const [gateError, setGateError] = useState<string | null>(null);
   const [setupRequired, setSetupRequired] = useState(false);
-  const [streamlitUrl, setStreamlitUrl] = useState(
-    import.meta.env.VITE_STREAMLIT_URL || "http://127.0.0.1:8501",
-  );
+  const [streamlitUrl, setStreamlitUrl] = useState(getStreamlitUrlFallback);
 
   const supabaseRef = useRef<SupabaseClient | null>(null);
   const gateInflight = useRef<Promise<GateResult> | null>(null);
@@ -166,21 +165,28 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     (async () => {
       try {
-        const sb = await getSupabase();
+        const configPromise = fetchPublicConfigCached();
+        const sbPromise = getSupabase();
+
+        const cfg = await configPromise;
+        if (!cancelled && cfg.streamlit_url) {
+          setStreamlitUrl(cfg.streamlit_url);
+        }
+
+        const sb = await sbPromise;
         if (cancelled) return;
         supabaseRef.current = sb;
         setSupabase(sb);
-
-        const cfgRes = await fetch("/api/config");
-        if (cfgRes.ok) {
-          const cfg = (await cfgRes.json()) as { streamlit_url?: string };
-          if (cfg.streamlit_url) setStreamlitUrl(cfg.streamlit_url);
-        }
 
         const { data } = await sb.auth.getSession();
         if (cancelled) return;
         setSession(data.session);
         setUser(data.session?.user ?? null);
+
+        const gatePromise =
+          data.session?.access_token && data.session.refresh_token
+            ? refreshGate(sessionToTokens(data.session))
+            : null;
 
         const {
           data: { subscription },
@@ -207,13 +213,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         });
         unsubscribe = () => subscription.unsubscribe();
 
-        if (data.session?.access_token && data.session.refresh_token) {
-          setSession(data.session);
-          setUser(data.session.user ?? null);
-          await refreshGate(sessionToTokens(data.session));
-        }
-
         setLoading(false);
+
+        if (gatePromise) {
+          await gatePromise;
+        }
       } catch {
         if (!cancelled) setLoading(false);
       }

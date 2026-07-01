@@ -1,7 +1,11 @@
 // Lazy Supabase client — credentials come from the Python API at runtime.
 
 import { createClient, type Session, type SupabaseClient } from "@supabase/supabase-js";
-import { getApiBase, getSupabaseEnv, missingProductionConfigHint } from "./runtimeConfig";
+import {
+  fetchPublicConfigCached,
+  getSupabaseEnv,
+  missingProductionConfigHint,
+} from "./runtimeConfig";
 
 let client: SupabaseClient | null = null;
 let initPromise: Promise<SupabaseClient> | null = null;
@@ -18,8 +22,10 @@ async function initSupabase(): Promise<SupabaseClient> {
   let { url, anonKey } = getSupabaseEnv();
 
   if (!url || !anonKey) {
-    const res = await fetch(`${getApiBase()}/api/config`);
-    if (!res.ok) {
+    const cfg = await fetchPublicConfigCached();
+    url = cfg.supabase_url ?? "";
+    anonKey = cfg.supabase_anon_key ?? "";
+    if (!url || !anonKey) {
       const hint = missingProductionConfigHint();
       throw new Error(
         hint
@@ -27,9 +33,6 @@ async function initSupabase(): Promise<SupabaseClient> {
           : "Could not load auth configuration from the server.",
       );
     }
-    const cfg = (await res.json()) as { supabase_url?: string; supabase_anon_key?: string };
-    url = cfg.supabase_url ?? "";
-    anonKey = cfg.supabase_anon_key ?? "";
   }
 
   if (!url || !anonKey) {

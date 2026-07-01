@@ -5,6 +5,7 @@ import { Button } from "../components/Button";
 import { InputField } from "../components/InputField";
 import { Translated } from "../components/Translated";
 import { postLoginPath, useAuth } from "../context/AuthContext";
+import { CenteredPageSkeleton } from "../components/Skeleton";
 import { useT } from "../context/LocaleContext";
 import { ApiError, createOrganization, joinOrganization } from "../lib/api";
 import {
@@ -53,11 +54,7 @@ export function OnboardingPage() {
   }, [gate, gateChecked, gateLoading, navigate, setupRequired]);
 
   if (gateLoading || (session && gate === null)) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-slate-50 text-sm text-slate-500">
-        <Translated text="Checking membership…" />
-      </div>
-    );
+    return <CenteredPageSkeleton label="Checking membership…" />;
   }
 
   const tokens =
