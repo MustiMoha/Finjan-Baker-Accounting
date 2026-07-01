@@ -1,5 +1,5 @@
-# Default Fly.io config — API service (repo root: fly deploy)
-# Streamlit: fly deploy --config deploy/fly-streamlit.toml
+# Fly.io — API service only (repo root: fly deploy)
+# Streamlit uses fly-streamlit.toml — do NOT deploy ali-al-baker-streamlit with this file.
 
 app = "ali-al-baker-api"
 primary_region = "iad"

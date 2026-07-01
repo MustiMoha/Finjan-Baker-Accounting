@@ -1,12 +1,12 @@
 # Fly.io — Streamlit (Financials) service
-# First time: fly apps create ali-al-baker-streamlit
-# Deploy:    fly deploy --config deploy/fly-streamlit.toml
+# Deploy:    fly deploy --config fly-streamlit.toml
+# Do NOT use fly.toml for this app — that config is for the API only.
 
 app = "ali-al-baker-streamlit"
 primary_region = "iad"
 
 [build]
-  dockerfile = "Dockerfile.streamlit"
+  dockerfile = "deploy/Dockerfile.streamlit"
 
 [http_service]
   internal_port = 8080
