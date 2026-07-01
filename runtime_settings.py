@@ -1,4 +1,4 @@
-"""Shared settings: OS environment (Railway/Vercel) with `.streamlit/secrets.toml` fallback."""
+"""Shared settings: OS environment (Fly.io/Vercel) with `.streamlit/secrets.toml` fallback."""
 
 from __future__ import annotations
 

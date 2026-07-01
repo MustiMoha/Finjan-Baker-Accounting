@@ -1,0 +1,15 @@
+.git
+.github
+.cursor
+**/__pycache__
+**/*.pyc
+**/.pytest_cache
+.streamlit/secrets.toml
+.env
+.env.*
+auth_web/node_modules
+auth_web/dist
+terminals
+*.xlsm
+*.xlsx
+Finjan Accounting 2026.csv

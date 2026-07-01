@@ -1,0 +1,32 @@
+# Fly.io — API service
+# First time: fly apps create ali-al-baker-api (or pick your app name below)
+# Deploy:    fly deploy --config deploy/fly-api.toml
+
+app = "ali-al-baker-api"
+primary_region = "iad"
+
+[build]
+  dockerfile = "deploy/Dockerfile.api"
+
+[env]
+  SERVE_AUTH_UI = "false"
+
+[http_service]
+  internal_port = 8080
+  force_https = true
+  auto_stop_machines = "stop"
+  auto_start_machines = true
+  min_machines_running = 0
+  processes = ["app"]
+
+  [[http_service.checks]]
+    grace_period = "45s"
+    interval = "30s"
+    method = "GET"
+    path = "/api/health"
+    timeout = "10s"
+
+[[vm]]
+  memory = "512mb"
+  cpu_kind = "shared"
+  cpus = 1

@@ -1,5 +1,5 @@
 -- One-time Streamlit session handoff codes (API mints, Streamlit exchanges).
--- Service role only; survives multi-instance Railway API deploys.
+-- Service role only; survives multi-instance Fly.io API deploys.
 
 create table if not exists public.streamlit_handoff_codes (
   code text primary key,

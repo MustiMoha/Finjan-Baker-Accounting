@@ -1,3 +1,4 @@
+# Legacy Railway — use deploy/fly-api.toml and fly deploy instead.
 # Copy to railway.toml at repo root for the API service, or set equivalent in Railway UI.
 
 [build]

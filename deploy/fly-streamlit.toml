@@ -1,0 +1,22 @@
+# Fly.io — Streamlit (Financials) service
+# First time: fly apps create ali-al-baker-streamlit
+# Deploy:    fly deploy --config deploy/fly-streamlit.toml
+
+app = "ali-al-baker-streamlit"
+primary_region = "iad"
+
+[build]
+  dockerfile = "deploy/Dockerfile.streamlit"
+
+[http_service]
+  internal_port = 8080
+  force_https = true
+  auto_stop_machines = "stop"
+  auto_start_machines = true
+  min_machines_running = 0
+  processes = ["app"]
+
+[[vm]]
+  memory = "1gb"
+  cpu_kind = "shared"
+  cpus = 1

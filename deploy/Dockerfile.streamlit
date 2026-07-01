@@ -1,0 +1,18 @@
+# Streamlit Financials — deploy with: fly deploy --config deploy/fly-streamlit.toml
+FROM python:3.12-slim-bookworm
+
+WORKDIR /app
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends tesseract-ocr \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY . .
+
+ENV PORT=8080
+EXPOSE 8080
+
+CMD ["bash", "deploy/start-streamlit.sh"]
