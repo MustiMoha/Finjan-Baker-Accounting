@@ -6,7 +6,7 @@ app = "ali-al-baker-streamlit"
 primary_region = "iad"
 
 [build]
-  dockerfile = "deploy/Dockerfile.streamlit"
+  dockerfile = "Dockerfile.streamlit"
 
 [http_service]
   internal_port = 8080

@@ -6,7 +6,7 @@ app = "ali-al-baker-api"
 primary_region = "iad"
 
 [build]
-  dockerfile = "deploy/Dockerfile.api"
+  dockerfile = "Dockerfile.api"
 
 [env]
   SERVE_AUTH_UI = "false"
